@@ -5,7 +5,7 @@ import os
 global path
 path='database.json'
 
-@cherrypy.expose
+#@cherrypy.expose
 class CatalogWebService(object):
 
 	def POST(self):
