@@ -10,12 +10,12 @@ class CatalogWebService(object):
 
 	def POST(self):
 		f=open(path,'r')
-		cherrypy.session['data']=f.read()
+		self.data=f.read()
 		f.close()
-		return cherrypy.session['data']
+		return self.data
 
 	def GET(self, *uri, **params):
-		data=json.loads(cherrypy.session['data'])
+		data=json.loads(self.data)
 		try:
 			if len(uri)==1:
 				out=json.dumps(data[uri[0]])
@@ -52,7 +52,7 @@ class CatalogWebService(object):
 	def PUT(self,*uri,**params):
 		if uri[0]=="new_device":
 			try:
-				data=json.loads(cherrypy.session['data'])
+				data=json.loads(self.data)
 				dev=data["devices"]
 				for i in range(len(dev)):
 					if dev[i]["deviceID"]==params["deviceID"]:
@@ -66,13 +66,13 @@ class CatalogWebService(object):
 				f=open(path,'w')
 				f.write(data)
 				f.close()
-				cherrypy.session['data']=data
+				self.data=data
 				return data
 			except:
 				raise cherrypy.HTTPError(400)
 		elif uri[0]=="new_user":
 			try:
-				data=json.loads(cherrypy.session['data'])
+				data=json.loads(self.data)
 				dev=data["users"]
 				for i in range(len(dev)):
 					if dev[i]["userID"]==params["userID"]:
@@ -84,7 +84,7 @@ class CatalogWebService(object):
 				f=open(path,'w')
 				f.write(data)
 				f.close()
-				cherrypy.session['data']=data
+				self.data=data
 				return data
 			except:
 				raise cherrypy.HTTPError(400)
@@ -92,7 +92,7 @@ class CatalogWebService(object):
 			raise cherrypy.HTTPError(404)
 			
 	def DELETE(self,*uri,**params):
-		data=json.loads(cherrypy.session['data'])
+		data=json.loads(self.data)
 		devices=data["devices"]
 		current_time=time.time()
 		dev=[]
@@ -100,13 +100,13 @@ class CatalogWebService(object):
 			if current_time-device["timestamp"]<60:
 				dev.append(device)
 		data["devices"]=dev
-		cherrypy.session['data']=json.dumps(data)
+		self.data=json.dumps(data)
 		data=json.dumps(data)
 		if dev!=devices:
 			f=open(path,'w')
 			f.write(data)
 			f.close()
-		return cherrypy.session['data']
+		return self.data
 
 cherrypy.config.update({'server.socket_host': '0.0.0.0',})
 cherrypy.config.update({'server.socket_port': int(os.environ.get('PORT', '5000')),})
